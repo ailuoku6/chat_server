@@ -4,11 +4,16 @@ socket.emit('login',{username:'gyyy',password:'12345',nickname:'潜伏'});
 // socket.emit('sendMsg',{to:1,msg:'hello'});
 socket.emit('getUnreadMsg');
 socket.emit('getOnlineUser');
+
+
 socket.on('event', function(data){});
 socket.on('disconnect', function(){});
 
 socket.on('loginResult',function (data) {
-    console.log(data)
+    console.log(data);
+    if (data.result){
+        socket.emit('sendMsg',{to:1,msg:'你好gy',key:12});
+    }
 });
 
 socket.on('getOnlineUserResult',function (data) {

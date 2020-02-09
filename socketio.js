@@ -40,6 +40,7 @@ message.init(Message,{
 //     });
 
 var users = {};//存储在线用户列表
+var sockets = {};
 
 //获取io
 socketio.getSocketio = function(server){
@@ -57,6 +58,7 @@ socketio.getSocketio = function(server){
             }).then((aUser)=>{
                 if (aUser&&aUser.password===encrypt(password)){
                     socket.name = aUser.id;
+                    sockets[aUser.id] = socket;
                     if (!users[aUser.id]){
                         users[aUser.id] = aUser;
                     }
@@ -80,6 +82,7 @@ socketio.getSocketio = function(server){
             user.create(newuser).then((aUser,error)=>{
                 if (aUser&&!error){
                     socket.name = aUser.id;
+                    sockets[aUser.id] = socket;
                     if (!users[aUser.id]){
                         users[aUser.id] = aUser;
                     }
@@ -107,6 +110,8 @@ socketio.getSocketio = function(server){
                         return item.from;
                     });
 
+                    console.log('fromUser',fromUser);
+
                     user.findAll({
                         where:{
                             id:{
@@ -114,6 +119,14 @@ socketio.getSocketio = function(server){
                             }
                         }
                     }).then((findUsers)=>{
+                        //去除密码
+                        findUsers = findUsers.map((item)=>{
+                            return {
+                                id:item.id,
+                                username:item.username,
+                                nickname:item.nickname
+                            }
+                        });
                         socket.emit('getMsgResult',{result:true,msgs:msgs,from:findUsers});
                     });
 
@@ -175,19 +188,42 @@ socketio.getSocketio = function(server){
             msg.msg = data.msg;
             let key = data.key;
             msg.time = new Date();
-            if (!users[data.from]){
+            console.log('请求',data);
+            if (!users[msg.from]){
                 socket.emit('sendFeedback',{result:false,key:key,msg:'非法请求'});
+                console.log('拦截非法请求',msg.from);
                 return;
             }
             msg.isread = 0;
             message.create(msg).then((msg)=>{
-                let clients = io.sockets.clients();
-                clients.forEach(function (client) {
-                    if (client.name === msg.to){
-                        client.emit('receiveMsg',{msg:msg});
-                        socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
-                    }
-                });
+
+                if (sockets[msg.to]){
+                    sockets[msg.to].emit('receiveMsg',{msg:msg});
+                }
+
+                socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
+
+                // let clients = io.serveClient(true);
+                //
+                // //console.log('创建msg',msg);
+                // console.log("socket",typeof clients);
+                //
+                // for (let key in clients){
+                //
+                //     let client = clients[key];
+                //     if (client.name === msg.to){
+                //         client.emit('receiveMsg',{msg:msg});
+                //         socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
+                //         break;
+                //     }
+                // }
+
+                // clients.forEach(function (client) {
+                //     if (client.name === msg.to){
+                //         client.emit('receiveMsg',{msg:msg});
+                //         socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
+                //     }
+                // });
             });
             // if (users[data.to]){//如果用户在线
             //
