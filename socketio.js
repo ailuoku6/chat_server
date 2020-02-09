@@ -2,6 +2,7 @@ var socketio = {};
 var socket_io = require('socket.io');
 const Sequelize = require('sequelize');
 const encrypt = require('./utils/encrypt');
+const Op = Sequelize.Op;
 
 const Model = Sequelize.Model;
 
@@ -100,14 +101,30 @@ socketio.getSocketio = function(server){
                         isread:0
                     }
                 }).then((msgs)=>{
-                    socket.emit('getMsgResult',{result:true,msgs:msgs});
-                    //发送完毕后把信息改为已读
-                    message.update({isread:1},{
-                        where:{
-                            to:id,
-                            isread:0
-                        }
+
+                    let fromUser = [];
+                    fromUser = msgs.map((item)=>{
+                        return item.from;
                     });
+
+                    user.findAll({
+                        where:{
+                            id:{
+                                [Op.or]:fromUser
+                            }
+                        }
+                    }).then((findUsers)=>{
+                        socket.emit('getMsgResult',{result:true,msgs:msgs,from:findUsers});
+                    });
+
+                    // socket.emit('getMsgResult',{result:true,msgs:msgs});
+                    //发送完毕后把信息改为已读
+                    // message.update({isread:1},{
+                    //     where:{
+                    //         to:id,
+                    //         isread:0
+                    //     }
+                    // });
                 });
             }else {
                 socket.emit('getMsgResult',{result:false});
@@ -117,9 +134,12 @@ socketio.getSocketio = function(server){
         socket.on('getOnlineUser',function () {
             let id = socket.name;
             if (id&&users[id]){
-                let onlineUsers;
-                onlineUsers =  users.filter((item)=>{
-                    if (item&&item.id!==id) return item;
+                let onlineUsers  =[];
+                for (let key in users){
+                    onlineUsers[onlineUsers.length] = users[key];
+                }
+                onlineUsers =  onlineUsers.filter((item)=>{
+                    if (item&&item.id!==id) return item;//智返回本次请求用户以外的用户
                 }).map((item)=>{
                     return {
                         id:item.id,
@@ -127,6 +147,7 @@ socketio.getSocketio = function(server){
                         nickname:item.nickname
                     }
                 });
+                console.log(onlineUsers);
                 socket.emit('getOnlineUserResult',{onlineUsers:onlineUsers});
             }else {
                 socket.emit('getOnlineUserResult',{onlineUsers:[]});
@@ -158,26 +179,42 @@ socketio.getSocketio = function(server){
                 socket.emit('sendFeedback',{result:false,key:key,msg:'非法请求'});
                 return;
             }
-            if (users[data.to]){//如果用户在线
-                msg.isread = 1;
-                message.create(msg).then((msg)=>{
-                    let clients = io.sockets.clients();
-                    clients.forEach(function (client) {
-                        if (client.name === msg.to){
-                            client.emit('receiveMsg',{msg:msg});
-                            socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
-                        }
-                    });
-                })
-            }else {
-                msg.isread = 0;
-                message.create(msg);
-                socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
-            }
-        })
+            msg.isread = 0;
+            message.create(msg).then((msg)=>{
+                let clients = io.sockets.clients();
+                clients.forEach(function (client) {
+                    if (client.name === msg.to){
+                        client.emit('receiveMsg',{msg:msg});
+                        socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
+                    }
+                });
+            });
+            // if (users[data.to]){//如果用户在线
+            //
+            // }else {
+            //     msg.isread = 0;
+            //     message.create(msg);
+            //     socket.emit('sendFeedback',{result:true,key:key,id:msg.id});
+            // }
+        });
 
         //通知所有用户有用户上线
         //通知所有用户有用户下线
+
+        //用户已查看信息，通知服务器已查看
+        socket.on('readEdMsg',function (data) {
+            let msgs = data.msgs;
+            msgs = msgs.filter((item)=>{
+                if (item.to===socket.name) return item.id;//过滤非法数据，即别人的消息
+            });
+            message.update({isread:1},{//相应数据在数据库中标为已读
+                where:{
+                    id:{
+                        [Op.or]:msgs
+                    }
+                }
+            })
+        });
     })
 };
 
