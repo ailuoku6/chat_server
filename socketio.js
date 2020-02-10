@@ -112,7 +112,12 @@ socketio.getSocketio = function(server){
 
                     console.log('fromUser',fromUser);
 
-                    user.findAll({
+                    if (fromUser.length===0){//为空就不用查了
+                        socket.emit('getMsgResult',{result:false});
+                        return;
+                    }
+
+                    user.findAll({//这里如果fromUser来自同意用户，返回的结果可能有重复?
                         where:{
                             id:{
                                 [Op.or]:fromUser
@@ -240,13 +245,16 @@ socketio.getSocketio = function(server){
         //用户已查看信息，通知服务器已查看
         socket.on('readEdMsg',function (data) {
             let msgs = data.msgs;
-            msgs = msgs.filter((item)=>{
+            let deleteIds = msgs.filter((item)=>{
                 if (item.to===socket.name) return item.id;//过滤非法数据，即别人的消息
             });
+
+            if (deleteIds.length===0) return;//需要标记的数据为空，就不标记，防止数据库把全部信息都标记为已读
+
             message.update({isread:1},{//相应数据在数据库中标为已读
                 where:{
                     id:{
-                        [Op.or]:msgs
+                        [Op.or]:deleteIds
                     }
                 }
             })

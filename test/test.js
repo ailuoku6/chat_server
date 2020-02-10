@@ -12,7 +12,7 @@ socket.on('disconnect', function(){});
 socket.on('loginResult',function (data) {
     console.log(data);
     if (data.result){
-        socket.emit('sendMsg',{to:1,msg:'你好gy',key:12});
+        socket.emit('sendMsg',{to:1,msg:'你好cgvsgvcgsvhdgcvdgcvshdvjhbxsbjxbhbshvxgvxgvsgvsvxgvsahxvsuxshgvxsghxvgcvsgdvgvxvxhgsavxgsvahvxhsvxgvxgsvxgvgsgy',key:12});
     }
 });
 
