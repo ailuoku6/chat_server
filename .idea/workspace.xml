@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="92469db5-45b2-4667-af2c-68fec80d25e8" name="Default Changelist" comment="">
+    <list default="true" id="92469db5-45b2-4667-af2c-68fec80d25e8" name="Default Changelist" comment="改动">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/node_modules/@types/node/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/@types/node/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/node_modules/accepts/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/accepts/package.json" afterDir="false" />
@@ -140,7 +140,6 @@
       <change beforePath="$PROJECT_DIR$/node_modules/yallist/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/yallist/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/node_modules/yeast/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/yeast/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/socketio.js" beforeDir="false" afterPath="$PROJECT_DIR$/socketio.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/test.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -210,7 +209,12 @@
       <workItem from="1581165591459" duration="5163000" />
       <workItem from="1581219196081" duration="10949000" />
       <workItem from="1581317735519" duration="931000" />
-      <workItem from="1581345138167" duration="1547000" />
+      <workItem from="1581345138167" duration="2849000" />
+      <workItem from="1581388803553" duration="2917000" />
+      <workItem from="1581475132154" duration="836000" />
+      <workItem from="1581560792254" duration="2187000" />
+      <workItem from="1581599487219" duration="380000" />
+      <workItem from="1581604626124" duration="1307000" />
     </task>
     <task id="LOCAL-00001" summary="改动">
       <created>1581219260816</created>
@@ -226,7 +230,14 @@
       <option name="project" value="LOCAL" />
       <updated>1581259573956</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="改动">
+      <created>1581348755908</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1581348755908</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

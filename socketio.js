@@ -14,6 +14,11 @@ const sequelize = new Sequelize('chat_db', 'root', 'FgyFgy666', {
     dialect: 'mysql'
 });
 
+// const sequelize = new Sequelize('chat_db', 'chat_db', 'fgyfgy666', {
+//     host: 'localhost',
+//     dialect: 'mysql'
+// });
+
 class user extends Model{}
 user.init(User,{
     sequelize,
@@ -63,7 +68,9 @@ socketio.getSocketio = function(server){
                         users[aUser.id] = aUser;
                     }
                     socket.emit('loginResult',{result: true,user:aUser});
-                    io.emit('online',{user:{id:aUser.id,username:aUser.username,nickname:aUser.nickname}});//通知所有在线用户有用户上线
+                    //todo : 改为通知除了当前socket的所有连接
+                    //io.emit('online',{user:{id:aUser.id,username:aUser.username,nickname:aUser.nickname}});//通知所有在线用户有用户上线
+                    socket.broadcast.emit('online',{user:{id:aUser.id,username:aUser.username,nickname:aUser.nickname}});//通知所有在线用户有用户上线
                 }else {
                     socket.emit('loginResult',{result:false,msg:'密码错误或账户不存在'});
                 }
@@ -86,7 +93,9 @@ socketio.getSocketio = function(server){
                     if (!users[aUser.id]){
                         users[aUser.id] = aUser;
                     }
-                    socket.emit('loginResult',{result:true,user:aUser})
+                    socket.emit('loginResult',{result:true,user:aUser});
+                    //todo : 改为通知除了当前socket的所有连接
+                    socket.broadcast.emit('online',{user:{id:aUser.id,username:aUser.username,nickname:aUser.nickname}});//通知所有在线用户有用户上线
                 }else {
                     socket.emit('loginResult',{result:false,msg:'注册失败，用户名已被占用'});
                 }
@@ -179,6 +188,7 @@ socketio.getSocketio = function(server){
             if (id&&users[id]){
                 console.log('用户：'+id+'断开连接');
                 delete users[id];
+                console.log(users);
                 io.emit('offline',{id:id})
             }
         });
