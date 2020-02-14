@@ -9,11 +9,14 @@ const Model = Sequelize.Model;
 const Message = require('./model/Message');
 const User = require('./model/User');
 
+//本机环境
 const sequelize = new Sequelize('chat_db', 'root', 'FgyFgy666', {
     host: 'localhost',
     dialect: 'mysql'
 });
 
+
+//服务器环境
 // const sequelize = new Sequelize('chat_db', 'chat_db', 'fgyfgy666', {
 //     host: 'localhost',
 //     dialect: 'mysql'
@@ -255,16 +258,18 @@ socketio.getSocketio = function(server){
         //用户已查看信息，通知服务器已查看
         socket.on('readEdMsg',function (data) {
             let msgs = data.msgs;
-            let deleteIds = msgs.filter((item)=>{
-                if (item.to===socket.name) return item.id;//过滤非法数据，即别人的消息
+            let markIds = [];
+            msgs.map((item)=>{
+                if (item.to===socket.name) markIds[markIds.length] = item.id;
             });
+            console.log("标记已读",markIds);
 
-            if (deleteIds.length===0) return;//需要标记的数据为空，就不标记，防止数据库把全部信息都标记为已读
+            if (markIds.length===0) return;//需要标记的数据为空，就不标记，防止数据库把全部信息都标记为已读
 
             message.update({isread:1},{//相应数据在数据库中标为已读
                 where:{
                     id:{
-                        [Op.or]:deleteIds
+                        [Op.or]:markIds
                     }
                 }
             })
