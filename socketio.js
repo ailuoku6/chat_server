@@ -10,17 +10,17 @@ const Message = require('./model/Message');
 const User = require('./model/User');
 
 //本机环境
-const sequelize = new Sequelize('chat_db', 'root', 'FgyFgy666', {
-    host: 'localhost',
-    dialect: 'mysql'
-});
-
-
-//服务器环境
-// const sequelize = new Sequelize('chat_db', 'chat_db', 'fgyfgy666', {
+// const sequelize = new Sequelize('chat_db', 'root', 'FgyFgy666', {
 //     host: 'localhost',
 //     dialect: 'mysql'
 // });
+
+
+//服务器环境
+const sequelize = new Sequelize('chat_db', 'chat_db', 'fgyfgy666', {
+    host: 'localhost',
+    dialect: 'mysql'
+});
 
 class user extends Model{}
 user.init(User,{
